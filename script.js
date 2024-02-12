@@ -210,3 +210,5 @@ init();
 // localStorage.removeItem('name');
 // localStorage.clear();
 // localStorage is not good for sensitive information
+
+// Site deployed to Netlify
