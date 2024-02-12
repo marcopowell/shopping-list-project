@@ -4,8 +4,13 @@ const itemList = document.getElementById('item-list');
 const clearBtn = document.getElementById('clear');
 const itemFilter = document.getElementById('filter');
 
+function displayItems(){
+    const itemsFromStorage = getItemsFromStorage();
+    itemsFromStorage.forEach(item => addItemToDOM(item));
+    checkUI();
+}
 
-function addItem (e){
+function onAddItemSubmit (e){
     e.preventDefault();
 
     const newItem = itemInput.value;
@@ -16,18 +21,27 @@ function addItem (e){
         return;
     }
 
-    //Create list item
-    const li = document.createElement('li');
-    li.appendChild(document.createTextNode(newItem));
+    // Create item DOM element 
+    addItemToDOM(newItem);
 
-    const button = createButton('remove-item btn-link text-red');
-    li.appendChild(button);
-    // Add li to the DOM
-    itemList.appendChild(li); 
+    // Add item to local storage 
+    addItemsToStorage(newItem);
 
     checkUI();
 
     itemInput.value = '';
+}
+
+function addItemToDOM (item){
+        //Create list item
+        const li = document.createElement('li');
+        li.appendChild(document.createTextNode(item));
+    
+        const button = createButton('remove-item btn-link text-red');
+        li.appendChild(button);
+
+        // Add li to the DOM
+        itemList.appendChild(li); 
 }
 
 function createButton(classes){
@@ -42,6 +56,28 @@ function createIcon(classes){
     const icon = document.createElement('i');
     icon.className = classes;
     return icon;
+}
+
+function addItemsToStorage (item){
+    let itemsFromStorage = getItemsFromStorage();
+
+    // Add new item to array
+    itemsFromStorage.push(item);
+
+    // Convert to JSON string and set to local storage
+    localStorage.setItem ('items', JSON.stringify(itemsFromStorage));
+}
+
+function getItemsFromStorage(){
+    let itemsFromStorage;
+
+    if (localStorage.getItem('items') === null) {
+        itemsFromStorage = [];
+    } else {
+        itemsFromStorage = JSON.parse(localStorage.getItem('items'));
+    }
+
+    return itemsFromStorage;
 }
 
 function removeItem(e){
@@ -88,11 +124,24 @@ function checkUI (){
     }
 }
 
-//Event listener
-itemForm.addEventListener('submit', addItem);
-itemList.addEventListener('click', removeItem);
-clearBtn.addEventListener('click', clearItems);
-itemFilter.addEventListener('input', filterItems);
+
+// Initialize app
+function init(){
+    //Event listener
+    itemForm.addEventListener('submit', onAddItemSubmit);
+    itemList.addEventListener('click', removeItem);
+    clearBtn.addEventListener('click', clearItems);
+    itemFilter.addEventListener('input', filterItems);
+    document.addEventListener('DOMContentLoaded', displayItems);
+
+    checkUI();
+}
+
+init();
 
 
-checkUI();
+// localStorage.setItem('name', 'Marco');
+// console.log(localStorage.getItem('name'));
+// localStorage.removeItem('name');
+// localStorage.clear();
+// localStorage is not good for sensitive information
